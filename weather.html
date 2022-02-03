@@ -1,0 +1,188 @@
+<!-- Taylor Monk coding challenge for InhabitIQ -->
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Current Weather</title>
+	<!--Add in link for a font to use-->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Trirong">
+	<!--Edit page styles-->
+	<style>
+	* {
+		background-color: black;
+	}
+	body {
+		font-family: "Trirong", serif;
+		font-size: 1.0em;
+		max-width: 1280px;
+		background-color: white;
+		margin: auto;
+	}
+	
+	h1 {
+		background-color: black;
+		color: white;
+		font-size: 2.5em;
+		padding-left: 20px;
+		padding-bottom: 20px;
+	}
+	
+	div {
+		background-color: white;
+	}
+	
+	/* Select all ids that begin with location */
+	[id^='location'] {
+		font-weight: bold;
+		font-size: 1.3em;
+	}
+	
+	/* Select all ids that begin with weather */
+	[id^='weather'] {
+		border-bottom: 2px solid black;
+		padding-bottom: 30px;
+		padding-left: 20px;
+		margin-left: 20px;
+		margin-right: 20px;
+	}
+	
+	#weather99502 {
+		border: none;
+	}
+	</style>
+</head>
+
+<body>
+	<h1>Current Weather by Zip Codes</h1>
+	<!--Create individual divs for the elements that will be added in later-->
+	<div id="weather29412">
+		<div id="location29412"></div>
+		<div id="description29412"></div>
+		<div id="pressure29412"></div>
+		<div id="temp29412"></div>
+		<div id="wind29412"></div>
+		<div id="humidity29412"></div>
+		<div id="time29412"></div>
+	</div>
+	<br>
+	<div id="weather10021">
+		<div id="location10021"></div>
+		<div id="description10021"></div>
+		<div id="pressure10021"></div>
+		<div id="temp10021"></div>
+		<div id="wind10021"></div>
+		<div id="humidity10021"></div>
+		<div id="time10021"></div>
+	</div>
+	<br>
+	<div id="weather90249">
+		<div id="location90249"></div>
+		<div id="description90249"></div>
+		<div id="pressure90249"></div>
+		<div id="temp90249"></div>
+		<div id="wind90249"></div>
+		<div id="humidity90249"></div>
+		<div id="time90249"></div>
+	</div>
+	<br>
+	<div id="weather68516">
+		<div id="location68516"></div>
+		<div id="description68516"></div>
+		<div id="pressure68516"></div>
+		<div id="temp68516"></div>
+		<div id="wind68516"></div>
+		<div id="humidity68516"></div>
+		<div id="time68516"></div>
+	</div>
+	<br>
+	<div id="weather99502">
+		<div id="location99502"></div>
+		<div id="description99502"></div>
+		<div id="pressure99502"></div>
+		<div id="temp99502"></div>
+		<div id="wind99502"></div>
+		<div id="humidity99502"></div>
+		<div id="time99502"></div>
+	</div>
+	
+	<!--Begin javascript coding section-->
+	<script lang="text/javascript">
+		// This function will retrieve the weather information from the OpenWeatherMap API using a zip code as the parameter
+		function getWeather(zip) {
+			// Create variable to store my API key
+			var key = '31b6ac084ded8e3b68426f6527e3eeb8';
+			// API call for data, units set to imperial
+			fetch('https://api.openweathermap.org/data/2.5/weather?zip=' + zip + '&appid=' + key + '&units=imperial')
+			// Convert data to JSON
+			.then(function(resp) {return resp.json() })
+			.then(function(data) {
+				// Call the displayWeather function using data retrieved and zip code given as parameters
+				displayWeather(data, zip);
+			})
+			// Catch any errors
+			.catch(function() {
+			});
+		}
+		
+		// This function will use the weather data and zip code as parameters in order to display specific data points on the page
+		function displayWeather(d, z) {
+			//Add city name and zip code to appropriate div
+			document.getElementById('location' + z).innerHTML = d.name + ', ' + z;
+			// Add weather description to appropriate div
+			document.getElementById('description' + z).innerHTML = d.weather[0].main;
+			// Add atmospheric pressure to appropriate div
+			document.getElementById('pressure' + z).innerHTML = 'Atmospheric Pressure ' + d.main.pressure + ' hPa';
+			// Add temperature rounded to nearest whole number to appropriate div
+			document.getElementById('temp' + z).innerHTML = Math.round(d.main.temp) + '&deg; F';
+			// Add wind speed and direction to appropriate div
+			// Function is called on wind direction data to convert it from degrees to cardinal direction
+			document.getElementById('wind' + z).innerHTML = 'Winds ' + d.wind.speed + ' mph ' + degreesToCompass(d.wind.deg);
+			// Add humidity to appropriate div
+			document.getElementById('humidity' + z).innerHTML = d.main.humidity + '% Humidity';
+			// Add time of data retrieval in UTC to appropriate div
+			// Function is called on time data to convert it from unix time code into standard time format
+			document.getElementById('time' + z).innerHTML = unixToTime(d.dt + 18000) + ' UTC';
+		}
+		
+		// Function to convert direction given in degrees to cardinal direction
+		// Takes degree number from 0-360 as a parameter
+		function degreesToCompass(deg) {
+			// There will be 16 sections each with 22.5 degrees to separate the directions
+			var val = Math.floor((deg / 22.5) + 0.5);
+			// List of cardinal directions
+			var compass = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+			// Mod value by amount of directions to select correct one and return it
+			return compass[(val % 16)];
+		}
+		
+		// Function to convert unix time code to standard time format
+		// Takes unix time code as parameter
+		function unixToTime(unixTime) {
+			// Create new Date object from unix time code, multiplied by 1000 for milliseconds
+			var date = new Date(unixTime * 1000);
+			// Get hours from time
+			var hours = date.getHours();
+			// Get minutes from time
+			var minutes = "0" + date.getMinutes();
+			// Get seconds from time
+			var seconds = "0" + date.getSeconds();
+			
+			// Display the time in HH:MM:SS format
+			var time = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+			
+			// Return the standard time format
+			return(time);
+		}
+		
+		// Set of zip codes to run when window loads
+		window.onload = function() {
+			getWeather(29412);
+			getWeather(10021);
+			getWeather(90249);
+			getWeather(68516);
+			getWeather(99502);
+		}
+	</script>
+</body>
+</html>
